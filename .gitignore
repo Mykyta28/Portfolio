@@ -1,0 +1,35 @@
+# Django database & media uploads
+db.sqlite3
+db.sqlite3-journal
+media/
+staticfiles/
+
+# Environment variables & secrets
+.env
+.env.*
+local_settings.py
+secrets.json
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python cache & compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Logs & test coverage
+*.log
+.coverage
+htmlcov/
+.pytest_cache/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
