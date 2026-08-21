@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Connectivity Diagnostics</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 30px;
+
+            background:
+                #0f172a;
+
+            color:
+                #e5e7eb;
+
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: auto;
+        }
+
+        h1 {
+            margin-bottom: 8px;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 20px;
+            box-shadow:
+                0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ================================================== */
+        /* STATUS */
+        /* ================================================== */
+
+        .status {
+            padding: 18px 20px;
+            border-radius: 12px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .status-success {
+            background: rgba(34, 197, 94, 0.12);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            color: #4ade80;
+        }
+
+        .status-fail {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #f87171;
+        }
+
+        /* ================================================== */
+        /* SUMMARY */
+        /* ================================================== */
+
+        .summary-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(200px, 1fr));
+
+            gap: 12px;
+        }
+
+        .summary-item {
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 16px;
+        }
+
+        .summary-label {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 19px;
+            font-weight: 700;
+        }
+
+        /* ================================================== */
+        /* BADGES */
+        /* ================================================== */
+
+        .ok {
+            color: #4ade80;
+            font-weight: 700;
+        }
+
+        .fail {
+            color: #f87171;
+            font-weight: 700;
+        }
+
+        .warning {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .muted {
+            color: #64748b;
+        }
+
+        /* ================================================== */
+        /* TABLE */
+        /* ================================================== */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th,
+        td {
+            border-bottom:
+                1px solid #334155;
+
+            padding: 11px;
+
+            text-align: left;
+
+            vertical-align: top;
+        }
+
+        th {
+            color: #94a3b8;
+            font-size: 13px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        .site-name {
+            font-weight: 700;
+        }
+
+        .ip {
+            font-family:
+                ui-monospace,
+                SFMono-Regular,
+                Menlo,
+                Monaco,
+                Consolas,
+                monospace;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+        /* ================================================== */
+        /* SMTP */
+        /* ================================================== */
+
+        .smtp-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(auto-fit, minmax(220px, 1fr));
+
+            gap: 12px;
+        }
+
+        .smtp-item {
+            background: #0f172a;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .smtp-label {
+            color: #94a3b8;
+            font-size: 13px;
+            margin-bottom: 7px;
+        }
+
+        .smtp-value {
+            font-size: 16px;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        /* ================================================== */
+        /* LOG */
+        /* ================================================== */
+
+        .log-toolbar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 15px;
+        }
+
+        button {
+            border: none;
+            border-radius: 8px;
+
+            padding:
+                10px 15px;
+
+            background: #2563eb;
+            color: white;
+
+            cursor: pointer;
+
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #1d4ed8;
+        }
+
+        button.secondary {
+            background: #475569;
+        }
+
+        button.secondary:hover {
+            background: #64748b;
+        }
+
+        .copy-status {
+            color: #4ade80;
+            display: none;
+            align-items: center;
+        }
+
+        .log-container {
+            background: #020617;
+
+            border:
+                1px solid #334155;
+
+            border-radius: 10px;
+
+            padding: 18px;
+
+            max-height: 700px;
+
+            overflow:
+                auto;
+        }
+
+        .log {
+            font-family:
+                ui-monospace,
+                SFMono-Regular,
+                Menlo,
+                Monaco,
+                Consolas,
+                monospace;
+
+            font-size: 12px;
+
+            line-height: 1.65;
+
+            white-space: pre-wrap;
+
+            word-break: break-word;
+
+            color: #cbd5e1;
+        }
+
+        /* ================================================== */
+        /* ERROR */
+        /* ================================================== */
+
+        .error-box {
+            margin-top: 15px;
+
+            background:
+                rgba(239, 68, 68, 0.08);
+
+            border:
+                1px solid rgba(239, 68, 68, 0.3);
+
+            border-radius: 10px;
+
+            padding: 15px;
+
+            color: #fca5a5;
+
+            font-family: monospace;
+
+            white-space: pre-wrap;
+
+            word-break: break-word;
+        }
+
+        @media (max-width: 700px) {
+
+            body {
+                padding: 15px;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            th,
+            td {
+                padding: 8px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <h1>Connectivity Diagnostics</h1>
+
+    <div class="subtitle">
+        Network, DNS, IPv4, IPv6, HTTPS, SMTP, STARTTLS and authentication test
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- OVERALL -->
+    <!-- ====================================================== -->
+
+    <div class="card">
+
+        {% if overall_ok %}
+
+            <div class="status status-success">
+                ✓ ALL TESTS PASSED
+            </div>
+
+        {% else %}
+
+            <div class="status status-fail">
+                ✗ SOME TESTS FAILED
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- SUMMARY -->
+    <!-- ====================================================== -->
+
+    <div class="card">
+
+        <h2>Summary</h2>
+
+        <div class="summary-grid">
+
+            <div class="summary-item">
+
+                <div class="summary-label">
+                    Internet
+                </div>
+
+                <div class="summary-value">
+
+                    {% if internet_ok %}
+
+                        <span class="ok">
+                            {{ internet_success }}/{{ internet_total }}
+                        </span>
+
+                    {% else %}
+
+                        <span class="fail">
+                            FAILED
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <div class="summary-label">
+                    SMTP Network
+                </div>
+
+                <div class="summary-value">
+
+                    {% if smtp_network_ok %}
+
+                        <span class="ok">
+                            OK
+                        </span>
+
+                    {% else %}
+
+                        <span class="fail">
+                            FAILED
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <div class="summary-label">
+                    SMTP
+                </div>
+
+                <div class="summary-value">
+
+                    {% if smtp_ok %}
+
+                        <span class="ok">
+                            OK
+                        </span>
+
+                    {% else %}
+
+                        <span class="fail">
+                            FAILED
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="summary-item">
+
+                <div class="summary-label">
+                    Duration
+                </div>
+
+                <div class="summary-value">
+
+                    {{ total_duration|floatformat:3 }} s
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- INTERNET -->
+    <!-- ====================================================== -->
+
+    <div class="card">
+
+        <h2>Internet Connectivity</h2>
+
+        <div class="table-wrapper">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Site
+                        </th>
+
+                        <th>
+                            IPv4
+                        </th>
+
+                        <th>
+                            IPv6
+                        </th>
+
+                        <th>
+                            TCP IPv4
+                        </th>
+
+                        <th>
+                            TCP IPv6
+                        </th>
+
+                        <th>
+                            HTTPS
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Time
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for site in site_results %}
+
+                    <tr>
+
+                        <td>
+
+                            <div class="site-name">
+                                {{ site.name }}
+                            </div>
+
+                            <div class="muted">
+                                {{ site.url }}
+                            </div>
+
+                        </td>
+
+
+                        <td>
+
+                            {% if site.ipv4 %}
+
+                                <div class="ip">
+
+                                    {% for ip in site.ipv4 %}
+                                        {{ ip }}<br>
+                                    {% endfor %}
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="muted">
+                                    None
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if site.ipv6 %}
+
+                                <div class="ip">
+
+                                    {% for ip in site.ipv6 %}
+                                        {{ ip }}<br>
+                                    {% endfor %}
+
+                                </div>
+
+                            {% else %}
+
+                                <span class="muted">
+                                    None
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if site.tcp_ipv4 %}
+
+                                {% for tcp in site.tcp_ipv4 %}
+
+                                    {% if tcp.success %}
+
+                                        <span class="ok">
+                                            ✓ {{ tcp.duration|floatformat:3 }}s
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="fail">
+                                            ✗
+                                        </span>
+
+                                    {% endif %}
+
+                                    <br>
+
+                                {% endfor %}
+
+                            {% else %}
+
+                                <span class="muted">
+                                    -
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if site.tcp_ipv6 %}
+
+                                {% for tcp in site.tcp_ipv6 %}
+
+                                    {% if tcp.success %}
+
+                                        <span class="ok">
+                                            ✓ {{ tcp.duration|floatformat:3 }}s
+                                        </span>
+
+                                    {% else %}
+
+                                        <span class="fail">
+                                            ✗
+                                        </span>
+
+                                    {% endif %}
+
+                                    <br>
+
+                                {% endfor %}
+
+                            {% else %}
+
+                                <span class="muted">
+                                    -
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if site.https_ok %}
+
+                                <span class="ok">
+                                    ✓ OK
+                                </span>
+
+                            {% else %}
+
+                                <span class="fail">
+                                    ✗ FAIL
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if site.http_status %}
+
+                                HTTP {{ site.http_status }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if site.response_time %}
+
+                                {{ site.response_time|floatformat:3 }}s
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+
+                    {% if site.error %}
+
+                        <tr>
+
+                            <td colspan="8">
+
+                                <div class="error-box">
+
+                                    {{ site.error }}
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endif %}
+
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- SMTP -->
+    <!-- ====================================================== -->
+
+    <div class="card">
+
+        <h2>SMTP Diagnostics</h2>
+
+        <div class="smtp-grid">
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    Server
+                </div>
+
+                <div class="smtp-value">
+                    {{ smtp_result.host }}:{{ smtp_result.port }}
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    Account
+                </div>
+
+                <div class="smtp-value">
+                    {{ smtp_result.user }}
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    DNS
+                </div>
+
+                <div class="smtp-value">
+
+                    {% if smtp_result.dns_ok %}
+
+                        <span class="ok">✓ OK</span>
+
+                    {% else %}
+
+                        <span class="fail">✗ FAIL</span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    SMTP Connection
+                </div>
+
+                <div class="smtp-value">
+
+                    {% if smtp_result.connection %}
+
+                        <span class="ok">✓ OK</span>
+
+                    {% else %}
+
+                        <span class="fail">✗ FAIL</span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    Greeting
+                </div>
+
+                <div class="smtp-value">
+
+                    {% if smtp_result.greeting %}
+
+                        <span class="ok">✓ 220 OK</span>
+
+                    {% else %}
+
+                        <span class="fail">✗ FAIL</span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    EHLO
+                </div>
+
+                <div class="smtp-value">
+
+                    {% if smtp_result.ehlo %}
+
+                        <span class="ok">✓ OK</span>
+
+                    {% else %}
+
+                        <span class="fail">✗ FAIL</span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    STARTTLS
+                </div>
+
+                <div class="smtp-value">
+
+                    {% if smtp_result.starttls %}
+
+                        <span class="ok">✓ OK</span>
+
+                    {% else %}
+
+                        <span class="fail">✗ FAIL</span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    Authentication
+                </div>
+
+                <div class="smtp-value">
+
+                    {% if smtp_result.auth %}
+
+                        <span class="ok">✓ OK</span>
+
+                    {% else %}
+
+                        <span class="fail">✗ FAIL</span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    TLS Version
+                </div>
+
+                <div class="smtp-value">
+
+                    {% if smtp_result.tls_version %}
+
+                        {{ smtp_result.tls_version }}
+
+                    {% else %}
+
+                        <span class="muted">
+                            -
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    TLS Cipher
+                </div>
+
+                <div class="smtp-value">
+
+                    {% if smtp_result.tls_cipher %}
+
+                        {{ smtp_result.tls_cipher.0 }}
+
+                    {% else %}
+
+                        <span class="muted">
+                            -
+                        </span>
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    IPv4
+                </div>
+
+                <div class="smtp-value ip">
+
+                    {% for ip in smtp_result.ipv4 %}
+
+                        {{ ip }}<br>
+
+                    {% empty %}
+
+                        <span class="muted">
+                            None
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+
+            <div class="smtp-item">
+
+                <div class="smtp-label">
+                    IPv6
+                </div>
+
+                <div class="smtp-value ip">
+
+                    {% for ip in smtp_result.ipv6 %}
+
+                        {{ ip }}<br>
+
+                    {% empty %}
+
+                        <span class="muted">
+                            None
+                        </span>
+
+                    {% endfor %}
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {% if smtp_result.extensions %}
+
+            <h3>
+                SMTP Extensions
+            </h3>
+
+            <div class="ip">
+
+                {% for extension in smtp_result.extensions %}
+
+                    {{ extension }}<br>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        {% if smtp_result.error %}
+
+            <div class="error-box">
+
+                {{ smtp_result.error }}
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ====================================================== -->
+    <!-- LOG -->
+    <!-- ====================================================== -->
+
+    <div class="card">
+
+        <h2>Detailed Log</h2>
+
+
+        <div class="log-toolbar">
+
+            <button
+                type="button"
+                onclick="copyLogs()"
+            >
+                Copy Log
+            </button>
+
+
+            <button
+                type="button"
+                class="secondary"
+                onclick="copyReport()"
+            >
+                Copy Diagnostic Report
+            </button>
+
+
+            <button
+                type="button"
+                class="secondary"
+                onclick="location.reload()"
+            >
+                Run Again
+            </button>
+
+
+            <span
+                id="copyStatus"
+                class="copy-status"
+            >
+                ✓ Copied
+            </span>
+
+        </div>
+
+
+        <div class="log-container">
+
+            {% for log in logs %}
+
+                <div class="log">
+                    {{ log }}
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================== -->
+<!-- JAVASCRIPT -->
+<!-- ======================================================== -->
+
+<script>
+
+    const logs = [
+        {% for log in logs %}
+            {{ log|escapejs }},
+        {% endfor %}
+    ];
+
+
+    async function copyText(text) {
+
+        try {
+
+            await navigator.clipboard.writeText(text);
+
+            showCopyStatus();
+
+        } catch (error) {
+
+            const textarea =
+                document.createElement("textarea");
+
+            textarea.value = text;
+
+            document.body.appendChild(textarea);
+
+            textarea.select();
+
+            document.execCommand("copy");
+
+            textarea.remove();
+
+            showCopyStatus();
+        }
+    }
+
+
+    function copyLogs() {
+
+        const text = logs.join("\n");
+
+        copyText(text);
+    }
+
+
+    function copyReport() {
+
+        const report = `
+CONNECTIVITY DIAGNOSTIC REPORT
+================================
+
+Internet:
+{{ internet_success }}/{{ internet_total }}
+
+SMTP host:
+{{ smtp_result.host }}:{{ smtp_result.port }}
+
+SMTP user:
+{{ smtp_result.user }}
+
+SMTP DNS:
+{% if smtp_result.dns_ok %}OK{% else %}FAILED{% endif %}
+
+SMTP connection:
+{% if smtp_result.connection %}OK{% else %}FAILED{% endif %}
+
+SMTP greeting:
+{% if smtp_result.greeting %}OK{% else %}FAILED{% endif %}
+
+EHLO:
+{% if smtp_result.ehlo %}OK{% else %}FAILED{% endif %}
+
+STARTTLS:
+{% if smtp_result.starttls %}OK{% else %}FAILED{% endif %}
+
+TLS version:
+{{ smtp_result.tls_version|default:"-" }}
+
+SMTP authentication:
+{% if smtp_result.auth %}OK{% else %}FAILED{% endif %}
+
+SMTP error:
+{{ smtp_result.error|default:"-" }}
+
+================================
+FULL LOG
+================================
+
+${logs.join("\n")}
+`;
+
+        copyText(report);
+    }
+
+
+    function showCopyStatus() {
+
+        const status =
+            document.getElementById("copyStatus");
+
+        status.style.display = "inline-flex";
+
+        setTimeout(() => {
+
+            status.style.display = "none";
+
+        }, 2000);
+    }
+
+</script>
+
+</body>
+
+</html>
