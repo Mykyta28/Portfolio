@@ -64,13 +64,28 @@ def email_contact(request):
             {sms}
             """
 
-            send_telegram_message(telegram_message)
+            try:
+                send_telegram_message(telegram_message)
+
+
+                for attachment in attachments:
+                    attachment.seek(0)
+                    send_telegram_file(attachment)
+
+            except Exception as e:
+                print(f"Telegram error: {e}")
+
+            messages.success(
+                request,
+                "Email sent successfully!"
+            )
 
             messages.success(request, "Email sent successfully!")
 
             return redirect('index')
 
     return redirect('index')
+
 
 def send_telegram_message(text):
     url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
@@ -81,4 +96,29 @@ def send_telegram_message(text):
     }
 
     response = requests.post(url, data=data, timeout=10)
+    response.raise_for_status()
+
+
+def send_telegram_file(file):
+    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendDocument"
+
+    files = {
+        "document": (
+            file.name,
+            file.read(),
+            file.content_type
+        )
+    }
+
+    data = {
+        "chat_id": settings.TELEGRAM_CHAT_ID,
+    }
+
+    response = requests.post(
+        url,
+        data=data,
+        files=files,
+        timeout=30
+    )
+
     response.raise_for_status()
