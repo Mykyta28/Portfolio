@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect
 from django.core.mail import EmailMessage
 from .form import EmailForm
+import requests
+from django.conf import settings
 
 
 def index(request):
@@ -50,8 +52,33 @@ def email_contact(request):
 
             email_message.send()
 
+            telegram_message = f"""📩 New message from website
+
+            Name: {full_name}
+            Company: {company_name}
+            Email: {user_email}
+
+            Subject: {subject}
+
+            Message:
+            {sms}
+            """
+
+            send_telegram_message(telegram_message)
+
             messages.success(request, "Email sent successfully!")
 
             return redirect('index')
 
     return redirect('index')
+
+def send_telegram_message(text):
+    url = f"https://api.telegram.org/bot{settings.TELEGRAM_BOT_TOKEN}/sendMessage"
+
+    data = {
+        "chat_id": settings.TELEGRAM_CHAT_ID,
+        "text": text,
+    }
+
+    response = requests.post(url, data=data, timeout=10)
+    response.raise_for_status()
