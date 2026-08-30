@@ -4,10 +4,24 @@ from django.core.mail import EmailMessage
 from .form import EmailForm
 import requests
 from django.conf import settings
+from .models import Certificate, Experience, Project, Education, Resume
 
 
 def index(request):
-    return render(request, 'main/index.html')
+    experience_list = Experience.objects.all()
+    project_list = Project.objects.all()
+    certificate_list = Certificate.objects.all()
+    education_list = Education.objects.all()
+    resume = Resume.objects.first()
+    return render(
+        request,
+        'main/index.html',
+        {'certificate_list': certificate_list,
+         'experience_list': experience_list,
+         'project_list': project_list,
+         'education_list': education_list,
+         'resume': resume,
+         })
 
 
 def email_contact(request):
